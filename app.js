@@ -3,6 +3,17 @@
 // Complete Application Logic (PT-BR)
 // ============================================================
 
+// ===================== PWA REGISTRATION =====================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      console.log('ServiceWorker registered:', reg.scope);
+    }).catch(err => {
+      console.log('ServiceWorker registration failed:', err);
+    });
+  });
+}
+
 // ===================== SUPABASE CONFIG =====================
 const SUPABASE_URL = 'https://myckyedoiglkxytyjyqa.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_WSdJEFExwxIOkGv60FQFzg_0OMOBXe5';
