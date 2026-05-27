@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Notázio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.92);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --gradient-1: #0f172a;
+            --gradient-2: #1e293b;
+            --gradient-3: #334155;
+            --btn-gradient: linear-gradient(135deg, #2563eb, #3b82f6);
+            --btn-hover: linear-gradient(135deg, #1d4ed8, #2563eb);
+        }
+
+        body {
+            background: linear-gradient(-45deg, var(--gradient-1), var(--gradient-2), var(--gradient-3), #1e1b4b);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 24px;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            color: #333;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeInUp 0.6s ease-out forwards;
+            box-sizing: border-box;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 48px;
+            animation: fadeInUp 0.6s ease-out 0.1s forwards;
+            opacity: 0;
+        }
+
+        .login-logo {
+            height: 64px;
+            display: block;
+            margin: 0 auto 64px auto;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+
+        .login-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 8px 0;
+            letter-spacing: -0.02em;
+        }
+
+        .login-subtitle {
+            font-size: 0.95rem;
+            color: #64748b;
+            margin: 0;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeInUp 0.6s ease-out 0.2s forwards;
+            opacity: 0;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #334155;
+            margin-left: 4px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px;
+            font-size: 1rem;
+            background: #f8fafc;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            color: #0f172a;
+        }
+
+        .form-input:focus {
+            outline: none;
+            background: #ffffff;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #ffffff;
+            background: var(--btn-gradient);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+            margin-top: 8px;
+        }
+
+        .btn-primary:hover {
+            background: var(--btn-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .auth-toggle {
+            text-align: center;
+            margin-top: 32px;
+            font-size: 0.95rem;
+            color: #64748b;
+            animation: fadeInUp 0.6s ease-out 0.3s forwards;
+            opacity: 0;
+        }
+
+        .auth-toggle a {
+            color: #2563eb;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: color 0.2s ease;
+            margin-left: 4px;
+        }
+
+        .auth-toggle a:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+        }
+
+        #login-error, #login-success {
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+            animation: fadeInUp 0.3s ease-out forwards;
+        }
+
+        #login-error {
+            color: #991b1b;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+
+        #login-success {
+            color: #166534;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+
+        /* MOBILE SPECIFIC OVERRIDES */
+        @media (max-width: 480px) {
+            body {
+                padding: 0;
+            }
+            .login-card {
+                max-width: 100%;
+                min-height: 100vh;
+                border-radius: 0;
+                border: none;
+                padding: 40px 24px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                background: var(--glass-bg);
+                box-shadow: none;
+            }
+            .login-logo {
+                height: 56px;
+            }
+            .form-input {
+                font-size: 16px; /* Prevents iOS Zoom */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-header">
+            <img src="logo.png" alt="Notázio" class="login-logo">
+            <h1 class="login-title" id="form-title">Entrar</h1>
+            <p class="login-subtitle" id="form-subtitle">Acesse sua conta para continuar</p>
+        </div>
+
+        <div id="login-error"></div>
+        <div id="login-success"></div>
+
+        <form class="auth-form" id="auth-form">
+            <div class="form-group" id="name-group" style="display: none; margin-bottom: 0;">
+                <label class="form-label" for="name">Nome Completo</label>
+                <input class="form-input" type="text" id="name" placeholder="João da Silva">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="email">E-mail</label>
+                <input class="form-input" type="email" id="email" required placeholder="seu@email.com">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="password">Senha</label>
+                <input class="form-input" type="password" id="password" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="btn-primary btn-full" id="submit-btn">Entrar na Conta</button>
+        </form>
+
+        <div class="auth-toggle">
+            <span id="toggle-text">Ainda não tem conta?</span> 
+            <a id="toggle-btn">Criar conta</a>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>
