@@ -1,4 +1,4 @@
-const CACHE_NAME = 'notazio-cache-v1';
+const CACHE_NAME = 'notazio-cache-v2';
 const urlsToCache = [
   './',
   './index.html',
