@@ -140,6 +140,7 @@ const perfectMobileCss = `
   }
 
   #btn-logout-mobile {
+    display: block !important;
     margin-top: 16px !important;
     margin-bottom: 0 !important;
     text-align: center !important;
@@ -286,7 +287,7 @@ const perfectMobileCss = `
   }
 
   /* ACTION BUTTONS */
-  .action-buttons {
+  #action-buttons {
     display: flex !important;
     flex-direction: column !important;
     gap: 12px !important;
@@ -295,7 +296,7 @@ const perfectMobileCss = `
     width: 100% !important;
   }
   
-  .action-buttons button {
+  #action-buttons button {
     width: 100% !important;
     padding: 14px !important;
     font-size: 1rem !important;

@@ -148,6 +148,7 @@ const newResponsiveBlock = `
   }
 
   #btn-logout-mobile {
+    display: block !important;
     margin-top: 16px !important;
     margin-bottom: 0 !important;
     text-align: center !important;
