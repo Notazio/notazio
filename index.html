@@ -162,6 +162,10 @@
                         <label class="form-label" for="emitter-address">Endereço</label>
                         <input class="form-input" type="text" id="emitter-address" placeholder="Rua, número, bairro, cidade - UF">
                     </div>
+                    <div class="form-group">
+                        <label class="form-label" for="emitter-pix">Chave PIX (Para receber pagamentos)</label>
+                        <input class="form-input" type="text" id="emitter-pix" placeholder="E-mail, CPF/CNPJ, Telefone ou Aleatória">
+                    </div>
                 </section>
 
                 <!-- Section 3: Recipient -->
@@ -333,6 +337,10 @@
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
                             Salvar Doc
                         </button>
+                        <button type="button" id="btn-whatsapp" class="btn-secondary" style="padding: 8px 16px; font-size: 0.85rem; background: #25D366; color: white; border-color: #25D366;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            Enviar WhatsApp
+                        </button>
                         <button type="button" id="btn-print" class="btn-primary" style="padding: 8px 16px; font-size: 0.85rem;">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
                             Gerar PDF
@@ -427,6 +435,8 @@
 
     <!-- PDF Generation Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

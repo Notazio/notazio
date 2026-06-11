@@ -41,7 +41,7 @@ const state = {
     docType: 'recibo',
     logo: null,
     colors: { primary: '#2563eb', secondary: '#0f172a' },
-    emitter: { name: '', doc: '', phone: '', email: '', address: '' },
+    emitter: { name: '', doc: '', phone: '', email: '', address: '', pix: '' },
     recipient: { name: '', doc: '', address: '' },
     document: { number: '001', date: '', time: '', city: '', value: '', valueText: '', description: '', paymentMethod: '', notes: '' },
     service: { period: '', warranty: '' },
@@ -68,6 +68,10 @@ async function init() {
             return;
         }
         currentUser = session.user;
+        
+        // Define initial greeting from user metadata or email
+        const fallbackName = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || (currentUser.email ? currentUser.email.split('@')[0] : 'Usuário');
+        updateGreetingUI(fallbackName.split(' ')[0]);
     } catch (err) {
         console.error("Auth error:", err);
         window.location.href = 'login.html';
@@ -198,6 +202,7 @@ async function init() {
         'emitter-phone':   { group: 'emitter',   key: 'phone', mask: 'phone' },
         'emitter-email':   { group: 'emitter',   key: 'email' },
         'emitter-address': { group: 'emitter',   key: 'address' },
+        'emitter-pix':     { group: 'emitter',   key: 'pix' },
         'recipient-name':  { group: 'recipient', key: 'name' },
         'recipient-doc':   { group: 'recipient', key: 'doc',   mask: 'cpfcnpj' },
         'recipient-address': { group: 'recipient', key: 'address' },
@@ -268,11 +273,13 @@ async function init() {
     }
 
     // Action buttons
+    const btnWhatsapp = document.getElementById('btn-whatsapp');
     const btnPrint = document.getElementById('btn-print');
     const btnSave = document.getElementById('btn-save');
     const btnClear = document.getElementById('btn-clear');
     const btnRegisterDoc = document.getElementById('btn-register-doc');
 
+    if (btnWhatsapp) btnWhatsapp.addEventListener('click', shareViaWhatsapp);
     if (btnPrint) btnPrint.addEventListener('click', printDocument);
     if (btnSave) btnSave.addEventListener('click', saveToStorage);
     if (btnClear) btnClear.addEventListener('click', clearAll);
@@ -811,6 +818,64 @@ function formatDateFull(dateStr) {
     return `${day} de ${months[month]} de ${year}`;
 }
 
+
+// ===================== PIX PAYLOAD =====================
+function generatePixPayload(key, amountStr, name, city) {
+    if (!key) return '';
+    let amount = '';
+    if (amountStr) {
+        let numeric = String(amountStr).replace(/[^0-9,.]/g, '').replace(',', '.');
+        let val = parseFloat(numeric);
+        if (!isNaN(val) && val > 0) {
+            amount = val.toFixed(2);
+        }
+    }
+    
+    function formatStr(id, value) {
+        if (!value) return '';
+        let strVal = String(value).substring(0, 99);
+        let len = String(strVal.length).padStart(2, '0');
+        return id + len + strVal;
+    }
+    
+    name = (name || 'EMITENTE').substring(0, 25).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+    city = (city || 'CIDADE').substring(0, 15).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+    
+    let pixKey = formatStr('01', key);
+    let merchantAccount = formatStr('26', '0014br.gov.bcb.pix' + pixKey);
+    
+    let payload = formatStr('00', '01') +
+                  formatStr('01', '11') +
+                  merchantAccount +
+                  formatStr('52', '0000') +
+                  formatStr('53', '0986');
+    
+    if (amount) {
+        payload += formatStr('54', amount);
+    }
+    
+    payload += formatStr('58', 'BR') +
+               formatStr('59', name) +
+               formatStr('60', city) +
+               formatStr('62', formatStr('05', '***'));
+               
+    payload += '6304';
+    
+    let crc = 0xFFFF;
+    for (let i = 0; i < payload.length; i++) {
+        crc ^= payload.charCodeAt(i) << 8;
+        for (let j = 0; j < 8; j++) {
+            if ((crc & 0x8000) !== 0) {
+                crc = (crc << 1) ^ 0x1021;
+            } else {
+                crc = crc << 1;
+            }
+        }
+    }
+    let crcHex = (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+    return payload + crcHex;
+}
+
 // ===================== UPDATE PREVIEW =====================
 function updatePreview() {
     const preview = document.getElementById('document-preview');
@@ -1080,22 +1145,6 @@ function printDocument() {
         return;
     }
     
-    const docNumber = state.document.number || '000';
-    const docTypeNames = { 'recibo': 'Recibo', 'servico': 'Servico', 'orcamento': 'Orcamento', 'ordem': 'OS' };
-    const typeName = docTypeNames[state.docType] || 'Documento';
-    const filename = `${typeName}_${docNumber}.pdf`;
-
-    const opt = {
-      margin:       15,
-      filename:     filename,
-      image:        { type: 'jpeg', quality: 1 },
-      html2canvas:  { scale: 4, useCORS: true, letterRendering: true },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    
-    const btn = document.getElementById('btn-print');
-    let originalText = 'Gerar PDF';
-    if (btn) {
         originalText = btn.innerHTML;
         btn.innerHTML = 'Gerando...';
         btn.disabled = true;
@@ -1176,7 +1225,8 @@ async function saveToStorage() {
             emitter_doc: state.emitter.doc,
             emitter_phone: state.emitter.phone,
             emitter_email: state.emitter.email,
-            emitter_address: state.emitter.address
+            emitter_address: state.emitter.address,
+                emitter_pix: state.emitter.pix
         };
 
         const { error } = await supabaseClient
@@ -1227,6 +1277,7 @@ async function loadFromStorage() {
             if (data.emitter_phone) state.emitter.phone = data.emitter_phone;
             if (data.emitter_email) state.emitter.email = data.emitter_email;
             if (data.emitter_address) state.emitter.address = data.emitter_address;
+            if (data.emitter_pix) state.emitter.pix = data.emitter_pix;
         }
 
         // 2. Load Draft from LocalStorage (Session Data)
