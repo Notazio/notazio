@@ -1145,6 +1145,22 @@ function printDocument() {
         return;
     }
     
+    const docNumber = state.document.number || '000';
+    const docTypeNames = { 'recibo': 'Recibo', 'servico': 'Servico', 'orcamento': 'Orcamento', 'ordem': 'OS' };
+    const typeName = docTypeNames[state.docType] || 'Documento';
+    const filename = `${typeName}_${docNumber}.pdf`;
+
+    const opt = {
+      margin:       0,
+      filename:     filename,
+      image:        { type: 'jpeg', quality: 1 },
+      html2canvas:  { scale: 4, useCORS: true, letterRendering: true, windowWidth: 800 },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    const btn = document.getElementById('btn-print');
+    let originalText = 'Gerar PDF';
+    if (btn) {
         originalText = btn.innerHTML;
         btn.innerHTML = 'Gerando...';
         btn.disabled = true;
@@ -1166,6 +1182,7 @@ function printDocument() {
         window.print(); // fallback
     });
 }
+
 function showToast(message, type = 'info') {
     const container = document.getElementById('toast-container');
     if (!container) return;
