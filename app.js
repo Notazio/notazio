@@ -1045,6 +1045,27 @@ function updatePreview() {
                 <span class="doc-field-value">${doc.paymentMethod}</span>
             </div>
         `;
+        if (doc.paymentMethod === 'PIX' && state.emitter.pix) {
+            let amount = (state.docType === 'recibo' || state.docType === 'servico') ? state.document.value : '';
+            if (state.docType === 'orcamento' || state.docType === 'ordem') {
+                let subtotal = 0;
+                state.items.forEach(item => subtotal += (item.qty||0)*(item.price||0));
+                let finalVal = Math.max(subtotal - (state.discount||0), 0);
+                if (finalVal > 0) amount = finalVal.toFixed(2);
+            }
+            const pixPayload = generatePixPayload(state.emitter.pix, amount, state.emitter.name, doc.city);
+            
+            paymentHtml += `
+                <div class="doc-pix-box" style="display: flex; gap: 16px; margin-top: 16px; padding: 16px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; align-items: center; page-break-inside: avoid;">
+                    <img src="https://chart.googleapis.com/chart?chs=120x120&cht=qr&chl=${encodeURIComponent(pixPayload)}&choe=UTF-8" alt="QR Code PIX" style="width: 100px; height: 100px; border-radius: 4px; border: 1px solid #e2e8f0; background: #fff;">
+                    <div>
+                        <div style="font-weight: 600; color: #0f172a; margin-bottom: 4px;">Pague via PIX</div>
+                        <div style="font-size: 0.85rem; color: #475569; margin-bottom: 6px;">Escaneie o QR Code ou use a chave abaixo:</div>
+                        <div style="font-family: monospace; font-weight: 600; color: #334155; font-size: 0.95rem; background: #e2e8f0; padding: 4px 8px; border-radius: 4px; display: inline-block;">${state.emitter.pix}</div>
+                    </div>
+                </div>
+            `;
+        }
     }
 
     // ---- Service info (servico / ordem) ----
