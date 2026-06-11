@@ -848,7 +848,7 @@ function generatePixPayload(key, amountStr, name, city) {
                   formatStr('01', '11') +
                   merchantAccount +
                   formatStr('52', '0000') +
-                  formatStr('53', '0986');
+                  formatStr('53', '986');
     
     if (amount) {
         payload += formatStr('54', amount);
