@@ -824,7 +824,7 @@ function generatePixPayload(key, amountStr, name, city) {
     if (!key) return '';
     let amount = '';
     if (amountStr) {
-        let numeric = String(amountStr).replace(/[^0-9,.]/g, '').replace(',', '.');
+        let numeric = String(amountStr).replace(/R\$\s?/g, '').trim().replace(/\./g, '').replace(',', '.');
         let val = parseFloat(numeric);
         if (!isNaN(val) && val > 0) {
             amount = val.toFixed(2);
