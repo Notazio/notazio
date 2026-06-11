@@ -1,14 +1,6 @@
 const fs = require('fs');
 let code = fs.readFileSync('app.js', 'utf8');
 
-// Add button binding
-const bindRegex = /const btnPrint = document.getElementById\('btn-print'\);/;
-code = code.replace(bindRegex, "const btnWhatsapp = document.getElementById('btn-whatsapp');\n    const btnPrint = document.getElementById('btn-print');");
-
-const eventRegex = /if \(btnPrint\) btnPrint\.addEventListener\('click', printDocument\);/;
-code = code.replace(eventRegex, "if (btnWhatsapp) btnWhatsapp.addEventListener('click', shareViaWhatsapp);\n    if (btnPrint) btnPrint.addEventListener('click', printDocument);");
-
-// Add function
 const waFunction = `
 // ===================== WHATSAPP SHARE =====================
 function shareViaWhatsapp() {
@@ -42,12 +34,11 @@ function shareViaWhatsapp() {
     const encodedText = encodeURIComponent(text);
     window.open(\`https://wa.me/?text=\${encodedText}\`, '_blank');
 }
-
 `;
 
-if (!code.includes('shareViaWhatsapp')) {
-    code = code.replace('// ===================== PRINT / PDF GENERATION =====================', waFunction + '// ===================== PRINT / PDF GENERATION =====================');
+if (!code.includes('function shareViaWhatsapp')) {
+    fs.appendFileSync('app.js', '\\n' + waFunction);
+    console.log("Appended");
+} else {
+    console.log("Already exists");
 }
-
-fs.writeFileSync('app.js', code);
-console.log('whatsapp patched');
