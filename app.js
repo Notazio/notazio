@@ -1057,7 +1057,7 @@ function updatePreview() {
             
             paymentHtml += `
                 <div class="doc-pix-box" style="display: flex; gap: 16px; margin-top: 16px; padding: 16px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; align-items: center; page-break-inside: avoid;">
-                    <img src="https://chart.googleapis.com/chart?chs=120x120&cht=qr&chl=${encodeURIComponent(pixPayload)}&choe=UTF-8" alt="QR Code PIX" style="width: 100px; height: 100px; border-radius: 4px; border: 1px solid #e2e8f0; background: #fff;">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(pixPayload)}" alt="QR Code PIX" style="width: 100px; height: 100px; border-radius: 4px; border: 1px solid #e2e8f0; background: #fff;">
                     <div>
                         <div style="font-weight: 600; color: #0f172a; margin-bottom: 4px;">Pague via PIX</div>
                         <div style="font-size: 0.85rem; color: #475569; margin-bottom: 6px;">Escaneie o QR Code ou use a chave abaixo:</div>
