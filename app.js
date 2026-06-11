@@ -1895,7 +1895,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
-\n
 // ===================== WHATSAPP SHARE =====================
 function shareViaWhatsapp() {
     let typeName = '';
