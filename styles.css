@@ -794,6 +794,7 @@ h1, h2, h3 {
 }
 
 #document-preview {
+  box-sizing: border-box;
   padding: 50px;
   color: #1e293b;
   font-family: 'Inter', sans-serif;
