@@ -795,6 +795,9 @@ h1, h2, h3 {
 
 #document-preview {
   box-sizing: border-box;
+  width: 210mm;
+  min-width: 210mm;
+  max-width: 210mm;
   padding: 50px;
   color: #1e293b;
   font-family: 'Inter', sans-serif;
