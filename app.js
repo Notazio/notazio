@@ -1136,8 +1136,8 @@ function updatePreview() {
 
 // ===================== PRINT / PDF GENERATION =====================
 function printDocument() {
-    const originalElement = document.getElementById('document-preview');
-    if (!originalElement) return;
+    const element = document.getElementById('document-preview');
+    if (!element) return;
     
     // Fallback to print dialog if html2pdf is not loaded
     if (typeof html2pdf === 'undefined') {
@@ -1150,20 +1150,11 @@ function printDocument() {
     const typeName = docTypeNames[state.docType] || 'Documento';
     const filename = `${typeName}_${docNumber}.pdf`;
 
-    // Clone element to avoid mobile viewport cropping and centering offsets
-    const element = originalElement.cloneNode(true);
-    element.style.position = 'absolute';
-    element.style.top = '0';
-    element.style.left = '0';
-    element.style.margin = '0';
-    element.style.zIndex = '-9999';
-    document.body.appendChild(element);
-
     const opt = {
       margin:       0,
       filename:     filename,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true, logging: false, windowWidth: 794 },
+      html2canvas:  { scale: 2, useCORS: true, logging: false },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     
@@ -1175,16 +1166,29 @@ function printDocument() {
         btn.disabled = true;
     }
 
+    // Fix mobile cropping by temporarily allowing overflow
+    const wrapper = document.getElementById('preview-wrapper');
+    if (wrapper) {
+        wrapper.style.setProperty('overflow', 'visible', 'important');
+        wrapper.style.setProperty('overflow-x', 'visible', 'important');
+    }
+
     html2pdf().set(opt).from(element).save().then(() => {
-        document.body.removeChild(element);
+        if (wrapper) {
+            wrapper.style.removeProperty('overflow');
+            wrapper.style.removeProperty('overflow-x');
+        }
         if (btn) {
             btn.innerHTML = originalText;
             btn.disabled = false;
         }
         showToast('PDF gerado com sucesso!', 'success');
     }).catch(err => {
-        document.body.removeChild(element);
         console.error(err);
+        if (wrapper) {
+            wrapper.style.removeProperty('overflow');
+            wrapper.style.removeProperty('overflow-x');
+        }
         if (btn) {
             btn.innerHTML = originalText;
             btn.disabled = false;
