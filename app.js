@@ -1155,7 +1155,8 @@ function printDocument() {
       filename:     filename,
       image:        { type: 'jpeg', quality: 1 },
       html2canvas:  { scale: 4, useCORS: true, letterRendering: true, windowWidth: 800 },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
     };
     
     const btn = document.getElementById('btn-print');
